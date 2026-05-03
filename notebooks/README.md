@@ -1,6 +1,14 @@
-# Notebooks
+# Notebook Thử Nghiệm
 
-Optional notebooks for dataset inspection and model-error analysis.
+Thư mục này dành cho các notebook phân tích nhanh trong quá trình làm đồ án.
 
-Do not put the main pipeline only in notebooks. The reproducible baseline should live in `src/`.
+## Mục Đích
 
+- Xem thử ảnh và annotation.
+- Kiểm tra phân bố nhãn.
+- Kiểm tra một số crop mẫu.
+- Phân tích lỗi sau khi có mô hình baseline.
+
+## Lưu Ý
+
+Notebook chỉ dùng để khám phá và minh họa. Pipeline chính phải nằm trong `src/` để có thể chạy lại ổn định và dễ chia việc cho nhóm.

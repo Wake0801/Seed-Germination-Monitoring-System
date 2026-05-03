@@ -4,7 +4,7 @@ project:
   task: binary_crop_classification
 
 data:
-  raw_root: ../GermPredDataset/GermPredDataset
+  raw_root: data/raw/GermPredDataset
   processed_root: data/processed
   metadata_dir: data/metadata
   image_size: 224
@@ -40,4 +40,3 @@ outputs:
   log_dir: outputs/logs
   report_dir: outputs/reports
   figure_dir: outputs/figures
-

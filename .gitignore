@@ -5,9 +5,11 @@ __pycache__/
 venv/
 
 # Generated datasets
+data/raw/GermPredDataset/**
 data/crops/**
 data/metadata/*.csv
 data/metadata/*.json
+!data/raw/README.md
 !data/crops/**/.gitkeep
 !data/metadata/.gitkeep
 
@@ -21,3 +23,4 @@ outputs/figures/**
 # Notebook checkpoints
 .ipynb_checkpoints/
 
+docs/phan_cong_cong_viec.md
