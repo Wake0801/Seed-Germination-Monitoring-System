@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Generated datasets
+data/crops/**
+data/metadata/*.csv
+data/metadata/*.json
+!data/crops/**/.gitkeep
+!data/metadata/.gitkeep
+
+# Training outputs
+outputs/checkpoints/**
+outputs/logs/**
+outputs/reports/**
+outputs/figures/**
+!outputs/**/.gitkeep
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+

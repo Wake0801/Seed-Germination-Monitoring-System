@@ -1,0 +1,37 @@
+# Improvement config for transfer learning after the Custom CNN baseline.
+project:
+  name: seed-germination-transfer-learning
+  task: binary_crop_classification
+
+data:
+  processed_root: data/processed
+  image_size: 224
+  augmentation:
+    random_rotation: true
+    horizontal_flip: true
+    brightness_contrast: true
+
+model:
+  candidates:
+    - resnet18
+    - mobilenet_v2
+    - efficientnet_b0
+  pretrained: true
+  num_classes: 2
+
+training:
+  epochs: 20
+  batch_size: 32
+  optimizer: adamw
+  learning_rate: 0.0003
+  scheduler: cosine
+  loss_candidates:
+    - cross_entropy
+    - focal_loss
+
+outputs:
+  checkpoint_dir: outputs/checkpoints/transfer_learning
+  log_dir: outputs/logs
+  report_dir: outputs/reports
+  figure_dir: outputs/figures
+

@@ -1,0 +1,43 @@
+# Baseline config for a simple Custom CNN classifier.
+project:
+  name: seed-germination-baseline
+  task: binary_crop_classification
+
+data:
+  raw_root: ../GermPredDataset/GermPredDataset
+  processed_root: data/processed
+  metadata_dir: data/metadata
+  image_size: 224
+  split_strategy: sequence_id
+  train_ratio: 0.8
+  val_ratio: 0.1
+  test_ratio: 0.1
+  labels:
+    non_germinated:
+      - zm_im
+      - sc_im
+      - pg_im
+    germinated:
+      - zm_el
+      - sc_el
+      - pg_el
+
+model:
+  name: custom_cnn
+  num_classes: 2
+  input_channels: 3
+
+training:
+  epochs: 10
+  batch_size: 32
+  optimizer: adam
+  learning_rate: 0.001
+  loss: cross_entropy
+  early_stopping: true
+
+outputs:
+  checkpoint_dir: outputs/checkpoints/baseline_cnn
+  log_dir: outputs/logs
+  report_dir: outputs/reports
+  figure_dir: outputs/figures
+

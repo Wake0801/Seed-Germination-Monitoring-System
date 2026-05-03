@@ -1,0 +1,11 @@
+# Temporary dependency list. Pin exact versions after the first working baseline.
+torch
+torchvision
+numpy
+pandas
+pillow
+torchmetrics
+matplotlib
+seaborn
+tqdm
+pyyaml
