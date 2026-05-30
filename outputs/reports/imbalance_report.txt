@@ -1,0 +1,23 @@
+CLASS IMBALANCE REPORT
+============================================================
+
+Dataset summary
+- Total objects: 235933
+- Total images: 23797
+- Total sequences: 247
+
+Overall binary distribution
+- germinated: 110540 objects (46.85%)
+- non-germinated: 125393 objects (53.15%)
+
+Imbalance level
+- Overall imbalance ratio: 1.1344
+- Train imbalance ratio: 1.1231
+- Severity: mild
+
+Train class weights, reference only
+- germinated: 1.0615
+- non-germinated: 0.9452
+
+Decision
+The binary class imbalance is mild. No aggressive resampling is applied at this stage. The training set is kept unchanged to preserve the natural time-series and petri dish structure. Class-level Precision, Recall, F1-score, and mAP should be monitored during model evaluation. If the germinated class shows low recall, class weights, focal loss, or train-only weighted sampling can be considered in later experiments.

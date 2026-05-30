@@ -1,0 +1,7 @@
+species_code,species_name,binary_label,count,total,percent
+pg,Pennisetum glaucum,germinated,48210,79928,60.31678510659594
+pg,Pennisetum glaucum,non-germinated,31718,79928,39.68321489340406
+sc,Secale cereale,germinated,40363,77047,52.38750373148857
+sc,Secale cereale,non-germinated,36684,77047,47.61249626851143
+zm,Zea mays,germinated,21967,78958,27.821120089161326
+zm,Zea mays,non-germinated,56991,78958,72.17887991083867
