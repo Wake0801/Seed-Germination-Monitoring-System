@@ -113,20 +113,25 @@ Baseline đã được train bằng notebook Colab:
 notebooks/custom_cnn_colab.ipynb
 ```
 
-Kết quả và checkpoint được lưu tại:
+Kết quả và checkpoint được sắp xếp theo đúng cấu trúc `outputs/`:
 
 ```text
-baseline_cnn_results/
+outputs/checkpoints/baseline_cnn/best_custom_cnn.pth
+outputs/logs/baseline_cnn/training_history.csv
+outputs/reports/baseline_cnn/test_summary.json
+outputs/reports/baseline_cnn/test_metrics.csv
+outputs/figures/baseline_cnn/learning_curves.png
+outputs/figures/baseline_cnn/confusion_matrix.png
 ```
 
 Các file kết quả chính:
 
-- `best_custom_cnn.pth`: checkpoint tốt nhất theo validation macro F1.
-- `training_history.csv`: log train/validation theo epoch.
-- `test_summary.json`: metric tổng hợp trên test set.
-- `test_metrics.csv`: metric theo từng lớp.
-- `learning_curves.png`: biểu đồ loss và macro F1.
-- `confusion_matrix.png`: confusion matrix trên test set.
+- `outputs/checkpoints/baseline_cnn/best_custom_cnn.pth`: checkpoint tốt nhất theo validation macro F1.
+- `outputs/logs/baseline_cnn/training_history.csv`: log train/validation theo epoch.
+- `outputs/reports/baseline_cnn/test_summary.json`: metric tổng hợp trên test set.
+- `outputs/reports/baseline_cnn/test_metrics.csv`: metric theo từng lớp.
+- `outputs/figures/baseline_cnn/learning_curves.png`: biểu đồ loss và macro F1.
+- `outputs/figures/baseline_cnn/confusion_matrix.png`: confusion matrix trên test set.
 
 Kết quả test:
 

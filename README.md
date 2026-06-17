@@ -62,7 +62,10 @@ Phần xử lý dữ liệu và baseline crop-classification đã chạy đượ
 - `data/metadata/`: chứa `all_objects.csv`, `all_objects_with_split.csv`, `sequence_split.csv`, `train.csv`, `val.csv`, `test.csv`.
 - `src/models/custom_cnn.py`: đã có Custom CNN baseline 3 block convolution, output logits 2 lớp.
 - `notebooks/custom_cnn_colab.ipynb`: notebook Colab dùng để train/validate/test baseline.
-- `baseline_cnn_results/`: chứa checkpoint, log train, metric test và hình confusion matrix của lần train baseline.
+- `outputs/checkpoints/baseline_cnn/`: chứa checkpoint tốt nhất của baseline.
+- `outputs/logs/baseline_cnn/`: chứa log train/validation theo epoch.
+- `outputs/reports/baseline_cnn/`: chứa metric test và README tóm tắt kết quả baseline.
+- `outputs/figures/baseline_cnn/`: chứa learning curves và confusion matrix.
 
 Kết quả test baseline hiện tại:
 

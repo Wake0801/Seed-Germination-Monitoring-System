@@ -32,7 +32,11 @@ data/crops/
 - Model baseline `CustomCNN` đã được định nghĩa trong `src/models/custom_cnn.py`.
 - Notebook Colab `notebooks/custom_cnn_colab.ipynb` đã được bổ sung các cell train, validate, test, lưu checkpoint và xuất confusion matrix.
 - Baseline đã được train bằng Colab notebook.
-- Kết quả train baseline đã được lưu trong `baseline_cnn_results/`.
+- Kết quả train baseline đã được sắp xếp trong `outputs/`:
+  - `outputs/checkpoints/baseline_cnn/`
+  - `outputs/logs/baseline_cnn/`
+  - `outputs/reports/baseline_cnn/`
+  - `outputs/figures/baseline_cnn/`
 
 Kết quả test baseline hiện tại:
 

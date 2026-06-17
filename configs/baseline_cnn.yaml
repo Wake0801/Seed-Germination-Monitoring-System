@@ -38,6 +38,6 @@ training:
 
 outputs:
   checkpoint_dir: outputs/checkpoints/baseline_cnn
-  log_dir: outputs/logs
-  report_dir: outputs/reports
-  figure_dir: outputs/figures
+  log_dir: outputs/logs/baseline_cnn
+  report_dir: outputs/reports/baseline_cnn
+  figure_dir: outputs/figures/baseline_cnn

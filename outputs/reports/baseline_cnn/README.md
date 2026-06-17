@@ -4,12 +4,12 @@ Thư mục này chứa kết quả train baseline Custom CNN bằng `notebooks/c
 
 ## Files
 
-- `best_custom_cnn.pth`: checkpoint tốt nhất theo validation macro F1.
-- `training_history.csv`: train/validation loss, accuracy và macro F1 theo epoch.
-- `test_summary.json`: metric tổng hợp trên test set.
-- `test_metrics.csv`: metric theo từng lớp.
-- `learning_curves.png`: biểu đồ loss và macro F1.
-- `confusion_matrix.png`: confusion matrix trên test set.
+- `outputs/checkpoints/baseline_cnn/best_custom_cnn.pth`: checkpoint tốt nhất theo validation macro F1.
+- `outputs/logs/baseline_cnn/training_history.csv`: train/validation loss, accuracy và macro F1 theo epoch.
+- `outputs/reports/baseline_cnn/test_summary.json`: metric tổng hợp trên test set.
+- `outputs/reports/baseline_cnn/test_metrics.csv`: metric theo từng lớp.
+- `outputs/figures/baseline_cnn/learning_curves.png`: biểu đồ loss và macro F1.
+- `outputs/figures/baseline_cnn/confusion_matrix.png`: confusion matrix trên test set.
 
 ## Test Summary
 
