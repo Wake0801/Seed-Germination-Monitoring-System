@@ -8,6 +8,16 @@ Thư mục này chứa định nghĩa các mô hình Deep Learning dùng trong �
 
 Baseline nên có kiến trúc dễ giải thích, ví dụ 2 đến 3 block convolution, sau đó là fully connected layer.
 
+Kiến trúc hiện tại:
+
+- Input: tensor RGB kích thước `[batch_size, 3, 224, 224]`.
+- Feature extractor: 3 block `Conv2d -> BatchNorm2d -> ReLU -> MaxPool2d`.
+- Số kênh lần lượt: 32, 64, 128.
+- Pooling cuối: `AdaptiveAvgPool2d(1, 1)`.
+- Classifier: `Dropout -> Linear(128, 64) -> ReLU -> Dropout -> Linear(64, 2)`.
+- Output: logits 2 lớp, dùng trực tiếp với `torch.nn.CrossEntropyLoss`.
+- Số tham số trainable khi dùng cấu hình mặc định: 101.858.
+
 ## Cải Tiến
 
 - `transfer_learning.py`: các mô hình Transfer Learning như ResNet18, MobileNetV2 hoặc EfficientNet-B0.

@@ -51,3 +51,41 @@ Raw dataset được ignore khỏi Git vì có kích thước lớn. Repository 
 4. Chia train/val/test theo `sequence_id`.
 5. Train Custom CNN đơn giản.
 6. Đánh giá bằng Accuracy, Precision, Recall, F1-score và Confusion Matrix.
+
+## Trạng Thái Hiện Tại
+
+Phần xử lý dữ liệu và baseline crop-classification đã chạy được end-to-end:
+
+- `src/data/build_crops.py`: tạo metadata object-level, split theo `sequence_id` và xuất ảnh crop.
+- `src/data/split_by_sequence.py`: chia lại metadata theo `sequence_id` khi cần.
+- `data/crops/`: chứa crop dataset theo cấu trúc `ImageFolder`.
+- `data/metadata/`: chứa `all_objects.csv`, `all_objects_with_split.csv`, `sequence_split.csv`, `train.csv`, `val.csv`, `test.csv`.
+- `src/models/custom_cnn.py`: đã có Custom CNN baseline 3 block convolution, output logits 2 lớp.
+- `notebooks/custom_cnn_colab.ipynb`: notebook Colab dùng để train/validate/test baseline.
+- `baseline_cnn_results/`: chứa checkpoint, log train, metric test và hình confusion matrix của lần train baseline.
+
+Kết quả test baseline hiện tại:
+
+| Metric | Giá trị |
+| --- | ---: |
+| Accuracy | 0.8336 |
+| Macro Precision | 0.8327 |
+| Macro Recall | 0.8308 |
+| Macro F1-score | 0.8316 |
+| Weighted F1-score | 0.8334 |
+
+Cách tạo lại crop dataset:
+
+```text
+python src/data/build_crops.py --overwrite
+```
+
+Nếu metadata đã có sẵn và chỉ muốn tạo lại ảnh crop:
+
+```text
+python src/data/build_crops.py --from-metadata --overwrite
+```
+
+Lưu ý: baseline được train bằng Colab notebook vì máy local không phù hợp để train toàn bộ crop dataset. Các file `src/training/train_baseline.py` và `src/training/evaluate.py` chưa dùng làm pipeline chính.
+
+Bước tiếp theo của đồ án là phân tích lỗi baseline, demo dự đoán trên test set và cải tiến bằng Transfer Learning.
