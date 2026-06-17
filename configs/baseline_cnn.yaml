@@ -5,6 +5,7 @@ project:
 
 data:
   raw_root: data/raw/GermPredDataset
+  crop_root: data/crops
   processed_root: data/processed
   metadata_dir: data/metadata
   image_size: 224
