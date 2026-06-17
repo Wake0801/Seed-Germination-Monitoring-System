@@ -7,6 +7,7 @@ venv/
 # Generated datasets
 data/raw/GermPredDataset/**
 data/crops/**
+data/*.zip
 data/metadata/*.csv
 data/metadata/*.json
 !data/raw/README.md
