@@ -47,12 +47,18 @@ Anh demo co san tai:
 data/demo/raw_images/
 ```
 
+Video demo co san tai:
+
+```text
+data/demo/videos/pg1_1_timelapse.mp4
+```
+
 Cach demo:
 
 1. Chay backend bang `uvicorn src.webapp.api:app --reload`.
 2. Mo `http://127.0.0.1:8000/`.
 3. Bam `Choose File`.
-4. Chon mot anh trong `data/demo/raw_images/`, hoac upload mot video ngan cung kieu Petri-dish.
+4. Chon mot anh trong `data/demo/raw_images/`, hoac chon video `data/demo/videos/pg1_1_timelapse.mp4`.
 5. Bam `Analyze`.
 
 Neu upload anh, web goi Faster R-CNN mot lan va ve bounding box len anh.
