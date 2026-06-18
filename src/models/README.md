@@ -20,9 +20,10 @@ Kiến trúc hiện tại:
 
 ## Cải Tiến
 
-- `transfer_learning.py`: các mô hình Transfer Learning như ResNet18, MobileNetV2 hoặc EfficientNet-B0.
+- `faster_rcnn.py`: Faster R-CNN ResNet50-FPN train from scratch cho bài toán object detection trên ảnh raw.
+- `transfer_learning.py`: placeholder, không dùng trong hướng nộp hiện tại vì đồ án không sử dụng pretrained model.
 
-Các mô hình cải tiến chỉ được thực hiện sau khi baseline Custom CNN chạy ổn định.
+Model cải tiến chính hiện tại phát hiện bounding box từng hạt và phân loại trực tiếp thành `non_germinated` hoặc `germinated`.
 
 ## Nguyên Tắc
 
