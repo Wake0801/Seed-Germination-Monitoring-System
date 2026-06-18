@@ -1,0 +1,5 @@
+filename,species,sequence_id,split,source_path
+raw_images/pg1_1_img001.jpg,Pennisetum glaucum,pg1_1,test,data/raw/GermPredDataset/PennisetumGlaucum/img/pg1_1_img001.jpg
+raw_images/pg2_12_img025.jpg,Pennisetum glaucum,pg2_12,test,data/raw/GermPredDataset/PennisetumGlaucum/img/pg2_12_img025.jpg
+raw_images/sc6_11_img063.jpg,Secale cereale,sc6_11,test,data/raw/GermPredDataset/SecaleCereale/img/sc6_11_img063.jpg
+raw_images/zm4_3_img047.jpg,Zea mays,zm4_3,test,data/raw/GermPredDataset/ZeaMays/img/zm4_3_img047.jpg

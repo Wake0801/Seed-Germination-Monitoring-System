@@ -1,0 +1,3 @@
+method,task_type,pretrained,accuracy,macro_f1,map,map_50,note
+Custom CNN baseline,crop classification,False,0.8336,0.8316,,,Baseline trained on cropped seed images
+Faster R-CNN scratch,object detection,False,,,0.6936748623847961,0.8973336815834045,"Main teacher-compliant model: trained from scratch on raw images and XML bounding boxes"

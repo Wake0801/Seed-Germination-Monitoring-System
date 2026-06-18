@@ -1,0 +1,48 @@
+{
+  "model": "fasterrcnn_resnet50_fpn_scratch",
+  "pretrained": false,
+  "weights": null,
+  "weights_backbone": null,
+  "num_classes": 3,
+  "class_names": {
+    "0": "background",
+    "1": "non_germinated",
+    "2": "germinated"
+  },
+  "train_images": 19076,
+  "val_images": 2312,
+  "test_images": 2409,
+  "total_records": 23797,
+  "total_objects": 235933,
+  "epochs": 30,
+  "batch_size": 16,
+  "train_time_min": 196.41755416790645,
+  "best_epoch": 6,
+  "test_metrics": {
+    "map": 0.6936748623847961,
+    "map_50": 0.8973336815834045,
+    "map_75": 0.8235071301460266,
+    "map_small": 0.02378777600824833,
+    "map_medium": 0.7022415399551392,
+    "map_large": 0.6195763945579529,
+    "mar_1": 0.11475612223148346,
+    "mar_10": 0.7919799089431763,
+    "mar_100": 0.8053634166717529,
+    "mar_small": 0.7666666507720947,
+    "mar_medium": 0.8096087574958801,
+    "mar_large": 0.6896180510520935,
+    "map_per_class": [
+      0.7324026226997375,
+      0.6549471020698547
+    ],
+    "mar_100_per_class": [
+      0.8396484851837158,
+      0.77107834815979
+    ],
+    "classes": [
+      1.0,
+      2.0
+    ],
+    "evaluated_images": 2409
+  }
+}
