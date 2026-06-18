@@ -31,6 +31,18 @@ Sau do mo:
 http://127.0.0.1:8000/
 ```
 
+Neu port `8000` dang bi chiem, chay bang port khac:
+
+```text
+uvicorn src.webapp.api:app --reload --port 8001
+```
+
+Sau do mo:
+
+```text
+http://127.0.0.1:8001/
+```
+
 Backend cung cap:
 
 - `GET /api/models`

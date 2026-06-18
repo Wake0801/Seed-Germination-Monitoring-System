@@ -14,6 +14,18 @@ Sau do mo:
 http://127.0.0.1:8000/
 ```
 
+Neu port `8000` dang bi chiem, dung port khac:
+
+```text
+uvicorn src.webapp.api:app --reload --port 8001
+```
+
+Sau do mo:
+
+```text
+http://127.0.0.1:8001/
+```
+
 ## Tat Backend
 
 Neu terminal dang chay `uvicorn`, bam:

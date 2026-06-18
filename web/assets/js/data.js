@@ -1,6 +1,6 @@
 window.SeedData = {
     app: {
-        apiBaseUrl: "http://localhost:8000/api",
+        apiBaseUrl: "/api",
     },
     models: [
         {
