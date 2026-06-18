@@ -24,6 +24,19 @@
         }
     }
 
+    function getConfidenceThreshold() {
+        const slider = document.getElementById("confidence-threshold");
+        const value = Number(slider?.value);
+        return Number.isFinite(value) ? value : 0.5;
+    }
+
+    function updateThresholdLabel() {
+        const output = document.getElementById("threshold-value");
+        if (output) {
+            output.textContent = getConfidenceThreshold().toFixed(2);
+        }
+    }
+
     function formatMetric(name, value) {
         if (value === undefined || value === null || value === "") {
             return "--";
@@ -50,6 +63,7 @@
         ui.renderBoundingBoxes(activeDetections);
         ui.updateSummary([]);
         bindEvents();
+        updateThresholdLabel();
         updateActiveModelChip();
         tryLoadBackendModels();
         window.addEventListener("resize", ui.syncOverlayToImage);
@@ -124,6 +138,7 @@
         document.getElementById("clear-input").addEventListener("click", clearInput);
         document.getElementById("analyze-btn").addEventListener("click", analyzeInput);
         document.getElementById("model-select").addEventListener("change", updateActiveModelChip);
+        document.getElementById("confidence-threshold").addEventListener("input", updateThresholdLabel);
         document.getElementById("export-report").addEventListener("click", () => alert("Report export endpoint is reserved for backend integration."));
         document.getElementById("download-results").addEventListener("click", () => alert("Annotated output download is reserved for backend integration."));
 
@@ -207,14 +222,15 @@
         document.getElementById("preview-empty").classList.add("hidden");
 
         const modelId = selectedModel.id;
+        const confidenceThreshold = getConfidenceThreshold();
         try {
             if (selectedFile.type.startsWith("image/")) {
                 setProcessingMessage("Analyzing image with Faster R-CNN...");
-                const prediction = await window.SeedApi.predictDetections(selectedFile, modelId, 0.5);
+                const prediction = await window.SeedApi.predictDetections(selectedFile, modelId, confidenceThreshold);
                 showPreview(normalizeApiDetections(prediction.detections), URL.createObjectURL(selectedFile));
             } else if (selectedFile.type.startsWith("video/")) {
                 setProcessingMessage("Sampling video frames...");
-                const frames = await analyzeVideoFile(selectedFile, modelId);
+                const frames = await analyzeVideoFile(selectedFile, modelId, confidenceThreshold);
                 showVideoPreview(frames);
             } else {
                 alert("Unsupported file type. Use an image or a short video.");
@@ -231,12 +247,12 @@
         }
     }
 
-    async function analyzeVideoFile(file, modelId) {
+    async function analyzeVideoFile(file, modelId, confidenceThreshold) {
         const frames = await extractVideoFrames(file);
         const results = [];
         for (const [index, frame] of frames.entries()) {
             setProcessingMessage(`Analyzing frame ${index + 1}/${frames.length}...`);
-            const prediction = await window.SeedApi.predictDetections(frame.file, modelId, 0.5);
+            const prediction = await window.SeedApi.predictDetections(frame.file, modelId, confidenceThreshold);
             results.push({
                 ...frame,
                 detections: normalizeApiDetections(prediction.detections),
