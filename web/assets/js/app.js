@@ -1,11 +1,28 @@
 (() => {
     const data = window.SeedData;
     const ui = window.SeedUi;
+    const maxVideoFrames = 8;
 
     let selectedFile = null;
     let playbackTimer = null;
     let activeDetections = data.detections;
-    let availableModels = data.models;
+    let activeFrameResults = [];
+    let availableModels = data.models.filter(isDetectionModel);
+
+    function isDetectionModel(model) {
+        return model?.taskType === "object_detection" || model?.task === "Object detection" || model?.task === "object_detection";
+    }
+
+    function getDetectionModels(models) {
+        return models.filter(isDetectionModel);
+    }
+
+    function setProcessingMessage(message) {
+        const node = document.getElementById("processing-message");
+        if (node) {
+            node.textContent = message;
+        }
+    }
 
     function formatMetric(name, value) {
         if (value === undefined || value === null || value === "") {
@@ -19,7 +36,9 @@
     }
 
     function initialize() {
-        ui.renderModelOptions(data.models, "faster_rcnn_scratch");
+        const detectionModels = getDetectionModels(data.models);
+        availableModels = detectionModels;
+        ui.renderModelOptions(detectionModels, "faster_rcnn_scratch", data.models);
         ui.renderModelCards(data.models);
         ui.renderMetricsTable(data.models);
         ui.renderSelectedMetrics(data.selectedMetrics);
@@ -59,14 +78,15 @@
                 f1: "--",
                 notes: model.notes || "",
             }));
-            const selectedDetectionModel = registry.selected_detection_model || registry.selected_model;
+            const detectionModels = getDetectionModels(registryModels);
+            const selectedDetectionModel = registry.selected_detection_model || detectionModels[0]?.id || registry.selected_model;
             if (registryModels.length) {
-                availableModels = registryModels;
-                ui.renderModelOptions(registryModels, selectedDetectionModel);
+                availableModels = detectionModels;
+                ui.renderModelOptions(detectionModels, selectedDetectionModel, registryModels);
                 ui.renderModelCards(registryModels);
                 ui.renderMetricsTable(registryModels);
                 document.getElementById("active-model-chip").textContent =
-                    registryModels.find((model) => model.id === selectedDetectionModel)?.name || "Best Model";
+                    detectionModels.find((model) => model.id === selectedDetectionModel)?.name || "Detection Model";
             }
         } catch (error) {
             console.info("Backend API not available; using static dashboard data.");
@@ -108,7 +128,11 @@
         document.getElementById("download-results").addEventListener("click", () => alert("Annotated output download is reserved for backend integration."));
 
         document.getElementById("frame-slider").addEventListener("input", (event) => {
-            document.getElementById("current-frame").textContent = event.target.value;
+            if (activeFrameResults.length > 1) {
+                showVideoFrame(Number(event.target.value) - 1);
+            } else {
+                document.getElementById("current-frame").textContent = event.target.value;
+            }
         });
 
         document.getElementById("play-pause").addEventListener("click", togglePlayback);
@@ -130,7 +154,7 @@
 
     function getSelectedModel() {
         const modelId = document.getElementById("model-select").value;
-        return availableModels.find((model) => model.id === modelId) || data.models.find((model) => model.id === modelId);
+        return availableModels.find((model) => model.id === modelId);
     }
 
     function switchTab(tab) {
@@ -143,12 +167,18 @@
 
     function handleFile(file) {
         selectedFile = file;
-        const fileType = file.type ? file.type.split("/")[0] : file.demo ? "video" : "unknown";
+        activeFrameResults = [];
+        stopPlayback();
+        const fileType = file.type ? file.type.split("/")[0] : "unknown";
         document.getElementById("file-name").textContent = file.name || "selected_input";
         document.getElementById("file-type").textContent = fileType;
-        document.getElementById("file-resolution").textContent = fileType === "image" ? "uploaded image" : "sequence/video";
-        document.getElementById("file-frames").textContent = fileType === "image" ? "1" : "90";
+        document.getElementById("file-resolution").textContent =
+            fileType === "image" ? "uploaded image" : fileType === "video" ? "video frames" : "unsupported";
+        document.getElementById("file-frames").textContent =
+            fileType === "image" ? "1" : fileType === "video" ? `up to ${maxVideoFrames}` : "--";
         document.getElementById("file-card").classList.remove("hidden");
+        ui.updateSummary([]);
+        ui.resetCurrentPrediction();
     }
 
     function normalizeApiDetections(detections) {
@@ -156,58 +186,160 @@
             id: item.id || index + 1,
             state: item.display_state || item.class_name,
             confidence: Math.round(Number(item.score || 0) * 100),
-            bbox: item.bbox_percent,
-            pixelBbox: item.bbox,
+            bbox: item.bbox_percent || { x: 0, y: 0, width: 0, height: 0 },
+            pixelBbox: item.bbox || null,
         }));
     }
 
     async function analyzeInput() {
         if (!selectedFile) {
-            alert("Choose a file or load a test sequence first.");
+            alert("Choose an image or video file first.");
             return;
         }
+
+        const selectedModel = getSelectedModel();
+        if (!selectedModel || selectedModel.taskType !== "object_detection") {
+            alert("Monitoring only supports the Faster R-CNN detection model. Use Model Comparison to view the baseline.");
+            return;
+        }
+
         document.getElementById("preview-processing").classList.remove("hidden");
         document.getElementById("preview-empty").classList.add("hidden");
 
-        let detections = data.detections;
-        if (selectedFile && selectedFile.type && selectedFile.type.startsWith("image/") && !selectedFile.demo) {
-            try {
-                const modelId = document.getElementById("model-select").value;
-                const selectedModel = getSelectedModel();
-                if (selectedModel?.taskType === "crop_classification") {
-                    const prediction = await window.SeedApi.predictCrop(selectedFile, modelId);
-                    detections = [
-                        {
-                            id: 1,
-                            state: prediction.display_state,
-                            confidence: Math.round(Number(prediction.confidence) * 100),
-                            bbox: { x: 5, y: 5, width: 90, height: 90 },
-                            pixelBbox: { x: 0, y: 0, width: "full", height: "full" },
-                        },
-                    ];
-                } else {
-                    const prediction = await window.SeedApi.predictDetections(selectedFile, modelId, 0.5);
-                    detections = normalizeApiDetections(prediction.detections);
-                }
-            } catch (error) {
-                console.info("Prediction API not available; using simulated detections.");
+        const modelId = selectedModel.id;
+        try {
+            if (selectedFile.type.startsWith("image/")) {
+                setProcessingMessage("Analyzing image with Faster R-CNN...");
+                const prediction = await window.SeedApi.predictDetections(selectedFile, modelId, 0.5);
+                showPreview(normalizeApiDetections(prediction.detections), URL.createObjectURL(selectedFile));
+            } else if (selectedFile.type.startsWith("video/")) {
+                setProcessingMessage("Sampling video frames...");
+                const frames = await analyzeVideoFile(selectedFile, modelId);
+                showVideoPreview(frames);
+            } else {
+                alert("Unsupported file type. Use an image or a short video.");
             }
-        }
-
-        setTimeout(() => {
+        } catch (error) {
+            console.error(error);
+            alert("Cannot run real inference. Start the backend with: uvicorn src.webapp.api:app --reload");
+            if (selectedFile.type.startsWith("image/")) {
+                showPreview([], URL.createObjectURL(selectedFile));
+            }
+        } finally {
             document.getElementById("preview-processing").classList.add("hidden");
-            showPreview(detections);
-        }, 500);
+            setProcessingMessage("Analyzing frames...");
+        }
     }
 
-    function showPreview(detections = data.detections) {
+    async function analyzeVideoFile(file, modelId) {
+        const frames = await extractVideoFrames(file);
+        const results = [];
+        for (const [index, frame] of frames.entries()) {
+            setProcessingMessage(`Analyzing frame ${index + 1}/${frames.length}...`);
+            const prediction = await window.SeedApi.predictDetections(frame.file, modelId, 0.5);
+            results.push({
+                ...frame,
+                detections: normalizeApiDetections(prediction.detections),
+            });
+        }
+        return results;
+    }
+
+    async function extractVideoFrames(file) {
+        const video = await loadVideo(file);
+        const duration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 1;
+        const frameCount = Math.min(maxVideoFrames, Math.max(1, Math.ceil(duration)));
+        const canvas = document.createElement("canvas");
+        const width = video.videoWidth || 640;
+        const height = video.videoHeight || 640;
+        const context = canvas.getContext("2d");
+        canvas.width = width;
+        canvas.height = height;
+
+        const frames = [];
+        for (let index = 0; index < frameCount; index += 1) {
+            const timestamp = Math.min(duration - 0.05, (duration * (index + 0.5)) / frameCount);
+            await seekVideo(video, Math.max(0, timestamp));
+            context.drawImage(video, 0, 0, width, height);
+            const blob = await canvasToBlob(canvas);
+            const name = `video_frame_${String(index + 1).padStart(3, "0")}.jpg`;
+            frames.push({
+                file: new File([blob], name, { type: "image/jpeg" }),
+                imageUrl: URL.createObjectURL(blob),
+                timestamp,
+                width,
+                height,
+                detections: [],
+            });
+        }
+
+        URL.revokeObjectURL(video.src);
+        return frames;
+    }
+
+    function loadVideo(file) {
+        return new Promise((resolve, reject) => {
+            const video = document.createElement("video");
+            video.preload = "metadata";
+            video.muted = true;
+            video.playsInline = true;
+            video.src = URL.createObjectURL(file);
+            video.onloadedmetadata = () => resolve(video);
+            video.onerror = () => reject(new Error("Cannot load video metadata."));
+        });
+    }
+
+    function seekVideo(video, time) {
+        return new Promise((resolve, reject) => {
+            if (Math.abs(video.currentTime - time) < 0.001) {
+                requestAnimationFrame(resolve);
+                return;
+            }
+            const cleanup = () => {
+                video.removeEventListener("seeked", onSeeked);
+                video.removeEventListener("error", onError);
+            };
+            const onSeeked = () => {
+                cleanup();
+                resolve();
+            };
+            const onError = () => {
+                cleanup();
+                reject(new Error("Cannot seek video frame."));
+            };
+            video.addEventListener("seeked", onSeeked);
+            video.addEventListener("error", onError);
+            video.currentTime = time;
+        });
+    }
+
+    function canvasToBlob(canvas) {
+        return new Promise((resolve, reject) => {
+            canvas.toBlob((blob) => {
+                if (blob) {
+                    resolve(blob);
+                } else {
+                    reject(new Error("Cannot export video frame."));
+                }
+            }, "image/jpeg", 0.92);
+        });
+    }
+
+    function showPreview(detections = data.detections, imageUrl = null) {
+        activeFrameResults = [];
         activeDetections = detections;
         const previewImage = document.getElementById("preview-image");
         previewImage.onload = () => {
+            if (selectedFile?.type?.startsWith("image/")) {
+                document.getElementById("file-resolution").textContent =
+                    `${previewImage.naturalWidth} x ${previewImage.naturalHeight}`;
+            }
             ui.syncOverlayToImage();
             ui.renderBoundingBoxes(activeDetections);
         };
-        if (selectedFile && selectedFile.type && selectedFile.type.startsWith("image/")) {
+        if (imageUrl) {
+            previewImage.src = imageUrl;
+        } else if (selectedFile && selectedFile.type && selectedFile.type.startsWith("image/")) {
             previewImage.src = URL.createObjectURL(selectedFile);
         } else {
             previewImage.src = data.previewImage;
@@ -230,9 +362,51 @@
         }
     }
 
+    function showVideoPreview(frames) {
+        activeFrameResults = frames;
+        const slider = document.getElementById("frame-slider");
+        slider.max = String(Math.max(frames.length, 1));
+        slider.value = "1";
+        document.getElementById("total-frames").textContent = String(frames.length);
+        document.getElementById("timeline-controls").classList.toggle("hidden", frames.length <= 1);
+        document.getElementById("file-frames").textContent = String(frames.length);
+        if (frames[0]) {
+            document.getElementById("file-resolution").textContent = `${frames[0].width} x ${frames[0].height}`;
+        }
+        showVideoFrame(0);
+    }
+
+    function showVideoFrame(index) {
+        const frame = activeFrameResults[index];
+        if (!frame) {
+            return;
+        }
+        activeDetections = frame.detections;
+        const previewImage = document.getElementById("preview-image");
+        previewImage.onload = () => {
+            ui.syncOverlayToImage();
+            ui.renderBoundingBoxes(activeDetections);
+        };
+        previewImage.src = frame.imageUrl;
+        document.getElementById("preview-empty").classList.add("hidden");
+        document.getElementById("preview-content").classList.remove("hidden");
+        document.getElementById("current-frame").textContent = String(index + 1);
+        document.getElementById("frame-slider").value = String(index + 1);
+        ui.renderBoundingBoxes(activeDetections);
+        requestAnimationFrame(ui.syncOverlayToImage);
+        ui.updateSummary(activeDetections);
+        if (activeDetections.length) {
+            ui.updateCurrentPrediction(activeDetections[0]);
+        } else {
+            ui.resetCurrentPrediction();
+        }
+    }
+
     function clearInput() {
         selectedFile = null;
-        activeDetections = data.detections;
+        activeDetections = [];
+        activeFrameResults = [];
+        document.getElementById("file-input").value = "";
         document.getElementById("file-card").classList.add("hidden");
         document.getElementById("preview-empty").classList.remove("hidden");
         document.getElementById("preview-content").classList.add("hidden");
@@ -251,6 +425,7 @@
         icon.classList.remove("fa-play");
         icon.classList.add("fa-pause");
         const slider = document.getElementById("frame-slider");
+        const speed = Number(document.getElementById("speed-select").value) || 1;
         playbackTimer = setInterval(() => {
             const next = Number(slider.value) + 1;
             if (next > Number(slider.max)) {
@@ -258,8 +433,8 @@
                 return;
             }
             slider.value = String(next);
-            document.getElementById("current-frame").textContent = slider.value;
-        }, 180);
+            showVideoFrame(next - 1);
+        }, 650 / speed);
     }
 
     function stopPlayback() {

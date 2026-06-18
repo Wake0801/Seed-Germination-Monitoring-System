@@ -1,8 +1,8 @@
 # Seed Germination Monitoring Web
 
-Thư mục này chứa giao diện dashboard cho hệ thống giám sát nảy mầm hạt giống.
+Thu muc nay chua giao dien dashboard cho he thong giam sat nay mam hat giong.
 
-## Cấu Trúc
+## Cau Truc
 
 ```text
 web/
@@ -15,99 +15,74 @@ web/
     +-- js/app.js
 ```
 
-`index.html` chỉ giữ layout chính. CSS, dữ liệu mô phỏng, API adapter và logic UI đã được tách riêng để dễ bảo trì.
+`index.html` giu layout chinh. CSS, du lieu mo phong, API adapter va logic UI duoc tach rieng de de bao tri.
 
-## Chạy Giao Diện Tĩnh
+## Chay Web Voi Backend PyTorch
 
-Mở trực tiếp file:
-
-```text
-web/index.html
-```
-
-Hoặc chạy server tĩnh bằng Python:
-
-```text
-python -m http.server 8000
-```
-
-Sau đó mở:
-
-```text
-http://localhost:8000/web/
-```
-
-## Cấu Trúc Giao Diện
-
-Dashboard có 2 phần chính:
-
-- `Monitoring System`: upload ảnh raw và xem bounding box + trạng thái hạt từ Faster R-CNN scratch.
-- `Model Comparison`: so sánh baseline Custom CNN với Faster R-CNN scratch theo metric phù hợp.
-
-Khi backend chạy, giao diện gọi inference thật trong `src/inference/`. Nếu backend chưa chạy, giao diện vẫn có dữ liệu mô phỏng để kiểm tra UI.
-
-Ảnh demo có sẵn tại:
-
-```text
-data/demo/raw_images/
-```
-
-Các ảnh này thuộc test split. Web không tự load ảnh demo; dùng nút `Choose File`
-và chọn thủ công ảnh trong thư mục này.
-Các ảnh này thuộc test split. Web không tự load ảnh demo; dùng nút `Choose File`
-và chọn thủ công ảnh trong thư mục này.
-
-## Chạy Với Backend PyTorch
-
-Nếu muốn dùng checkpoint `.pth` thật, chạy backend:
+Day la cach chay dung neu muon dung checkpoint `.pth` that:
 
 ```text
 uvicorn src.webapp.api:app --reload
 ```
 
-Sau đó mở:
+Sau do mo:
 
 ```text
 http://127.0.0.1:8000/
 ```
 
-Backend cung cấp:
+Backend cung cap:
 
 - `GET /api/models`
 - `POST /api/predict/crop`
 - `POST /api/predict/detect`
 
-Frontend sẽ cố gọi API model registry và endpoint Faster R-CNN detection. Nếu backend chưa chạy, giao diện vẫn hoạt động bằng dữ liệu mô phỏng.
+Monitoring System hien chi cho chon model object detection Faster R-CNN. Baseline Custom CNN van duoc giu trong tab Model Comparison de so sanh ket qua, khong dung cho demo anh raw.
 
-## Kết Nối Model
+## Demo Anh Va Video
 
-Model được khai báo trong:
-
-```text
-configs/model_registry.json
-```
-
-Model detection chính hiện tại:
+Anh demo co san tai:
 
 ```text
-outputs/checkpoints/faster_rcnn_scratch/best_faster_rcnn_resnet50_fpn_scratch.pth
+data/demo/raw_images/
 ```
 
-Baseline crop classification vẫn được giữ tại:
+Cach demo:
+
+1. Chay backend bang `uvicorn src.webapp.api:app --reload`.
+2. Mo `http://127.0.0.1:8000/`.
+3. Bam `Choose File`.
+4. Chon mot anh trong `data/demo/raw_images/`, hoac upload mot video ngan cung kieu Petri-dish.
+5. Bam `Analyze`.
+
+Neu upload anh, web goi Faster R-CNN mot lan va ve bounding box len anh.
+
+Neu upload video, web trich toi da 8 frame mau, gui tung frame vao Faster R-CNN, sau do hien thanh frame slider de xem ket qua theo tung frame mau. Day la demo video o muc he thong, khong can train lai model.
+
+## Tat Web
+
+Web khong tu chay vinh vien. No chi con mo khi server/terminal van dang chay.
+
+Neu dang chay `uvicorn` trong terminal, bam:
 
 ```text
-outputs/checkpoints/baseline_cnn/best_custom_cnn.pth
+Ctrl + C
 ```
 
-## Lưu Ý
+Neu chi mo truc tiep file `web/index.html`, chi can dong tab trinh duyet vi khong co backend server.
 
-Model trạng thái học 2 lớp chính của dataset:
+Neu quen server dang chay o terminal nao, kiem tra process dang nghe port 8000:
 
-```text
-germinated
-non_germinated
+```powershell
+Get-NetTCPConnection -LocalPort 8000 -State Listen | Select-Object -ExpandProperty OwningProcess
 ```
 
-Trạng thái `transition` trên giao diện là trạng thái vận hành được suy ra từ confidence threshold, không phải lớp thứ ba được train trực tiếp.
+Sau khi biet PID, tat process do:
 
-File `.pth` chạy được với backend Python/PyTorch. Không cần export ONNX trừ khi muốn chạy inference trực tiếp trong browser hoặc ONNX Runtime.
+```powershell
+Stop-Process -Id <PID>
+```
+
+## `.pth` Hay ONNX?
+
+File `.pth` chay duoc voi backend Python/PyTorch hien tai. Khong can export ONNX tru khi muon chay inference truc tiep trong browser, dung ONNX Runtime, hoac deploy sang moi truong khong cai PyTorch.

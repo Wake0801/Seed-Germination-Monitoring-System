@@ -7,17 +7,25 @@ window.SeedUi = (() => {
         return normalizeState(state).replace("_", "-");
     }
 
-    function renderModelOptions(models, selectedId = "best_model") {
+    function renderModelOptions(models, selectedId = "best_model", comparisonModels = models) {
         const select = document.getElementById("model-select");
         const confusionSelect = document.getElementById("confusion-model-select");
-        const options = models
+        const renderOptions = (items) => items
             .map((model) => {
                 const task = model.task ? ` - ${model.task}` : "";
                 return `<option value="${model.id}" ${model.id === selectedId ? "selected" : ""}>${model.name}${task}</option>`;
             })
             .join("");
-        select.innerHTML = options;
-        confusionSelect.innerHTML = options;
+
+        if (models.length) {
+            select.disabled = false;
+            select.innerHTML = renderOptions(models);
+        } else {
+            select.disabled = true;
+            select.innerHTML = '<option value="">No detection model available</option>';
+        }
+
+        confusionSelect.innerHTML = renderOptions(comparisonModels);
     }
 
     function renderModelCards(models) {
