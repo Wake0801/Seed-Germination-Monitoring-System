@@ -52,7 +52,10 @@ Khi backend chạy, giao diện gọi inference thật trong `src/inference/`. N
 data/demo/raw_images/
 ```
 
-Các ảnh này thuộc test split và được web phục vụ qua route `/demo`.
+Các ảnh này thuộc test split. Web không tự load ảnh demo; dùng nút `Choose File`
+và chọn thủ công ảnh trong thư mục này.
+Các ảnh này thuộc test split. Web không tự load ảnh demo; dùng nút `Choose File`
+và chọn thủ công ảnh trong thư mục này.
 
 ## Chạy Với Backend PyTorch
 

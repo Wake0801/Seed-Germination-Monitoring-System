@@ -23,7 +23,6 @@ from src.inference.model_registry import DEFAULT_REGISTRY_PATH, load_registry
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 WEB_ROOT = PROJECT_ROOT / "web"
-DEMO_ROOT = PROJECT_ROOT / "data" / "demo"
 
 app = FastAPI(
     title="Seed Germination Monitoring API",
@@ -124,7 +123,6 @@ def dashboard() -> FileResponse:
 
 
 app.mount("/assets", StaticFiles(directory=WEB_ROOT / "assets"), name="assets")
-app.mount("/demo", StaticFiles(directory=DEMO_ROOT), name="demo")
 
 
 if __name__ == "__main__":

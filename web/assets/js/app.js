@@ -20,7 +20,6 @@
 
     function initialize() {
         ui.renderModelOptions(data.models, "faster_rcnn_scratch");
-        ui.renderDemoOptions(data.demoImages);
         ui.renderModelCards(data.models);
         ui.renderMetricsTable(data.models);
         ui.renderSelectedMetrics(data.selectedMetrics);
@@ -102,7 +101,6 @@
             }
         });
 
-        document.getElementById("load-demo-image").addEventListener("click", loadDemoImage);
         document.getElementById("clear-input").addEventListener("click", clearInput);
         document.getElementById("analyze-btn").addEventListener("click", analyzeInput);
         document.getElementById("model-select").addEventListener("change", updateActiveModelChip);
@@ -135,26 +133,6 @@
         return availableModels.find((model) => model.id === modelId) || data.models.find((model) => model.id === modelId);
     }
 
-    async function loadDemoImage() {
-        const demoId = document.getElementById("demo-select").value;
-        const demo = data.demoImages.find((item) => item.id === demoId);
-        if (!demo) return;
-
-        try {
-            const response = await fetch(demo.url);
-            if (!response.ok) {
-                throw new Error(`Unable to load demo image: ${response.status}`);
-            }
-            const blob = await response.blob();
-            const file = new File([blob], demo.fileName, { type: blob.type || "image/jpeg" });
-            file.demoSource = demo;
-            handleFile(file);
-            showPreview([]);
-        } catch (error) {
-            alert("Cannot load demo image. Run the backend and open http://127.0.0.1:8000/.");
-        }
-    }
-
     function switchTab(tab) {
         document.querySelectorAll(".tab-button").forEach((button) => {
             button.classList.toggle("active", button.dataset.tab === tab);
@@ -168,9 +146,7 @@
         const fileType = file.type ? file.type.split("/")[0] : file.demo ? "video" : "unknown";
         document.getElementById("file-name").textContent = file.name || "selected_input";
         document.getElementById("file-type").textContent = fileType;
-        document.getElementById("file-resolution").textContent = file.demoSource
-            ? `${file.demoSource.species} / ${file.demoSource.sequence}`
-            : fileType === "image" ? "uploaded image" : "sequence/video";
+        document.getElementById("file-resolution").textContent = fileType === "image" ? "uploaded image" : "sequence/video";
         document.getElementById("file-frames").textContent = fileType === "image" ? "1" : "90";
         document.getElementById("file-card").classList.remove("hidden");
     }

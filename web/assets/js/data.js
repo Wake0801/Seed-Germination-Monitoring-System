@@ -1,47 +1,7 @@
-const seedDemoBaseUrl = window.location.protocol === "file:" ? "../data/demo" : "/demo";
-
 window.SeedData = {
     app: {
         apiBaseUrl: "http://localhost:8000/api",
     },
-    demoImages: [
-        {
-            id: "pg1_1_img001",
-            name: "PG test frame 001",
-            fileName: "pg1_1_img001.jpg",
-            species: "Pennisetum glaucum",
-            sequence: "pg1_1",
-            split: "test",
-            url: `${seedDemoBaseUrl}/raw_images/pg1_1_img001.jpg`,
-        },
-        {
-            id: "pg2_12_img025",
-            name: "PG test frame 025",
-            fileName: "pg2_12_img025.jpg",
-            species: "Pennisetum glaucum",
-            sequence: "pg2_12",
-            split: "test",
-            url: `${seedDemoBaseUrl}/raw_images/pg2_12_img025.jpg`,
-        },
-        {
-            id: "sc6_11_img063",
-            name: "SC test frame 063",
-            fileName: "sc6_11_img063.jpg",
-            species: "Secale cereale",
-            sequence: "sc6_11",
-            split: "test",
-            url: `${seedDemoBaseUrl}/raw_images/sc6_11_img063.jpg`,
-        },
-        {
-            id: "zm4_3_img047",
-            name: "ZM test frame 047",
-            fileName: "zm4_3_img047.jpg",
-            species: "Zea mays",
-            sequence: "zm4_3",
-            split: "test",
-            url: `${seedDemoBaseUrl}/raw_images/zm4_3_img047.jpg`,
-        },
-    ],
     models: [
         {
             id: "custom_cnn_baseline",

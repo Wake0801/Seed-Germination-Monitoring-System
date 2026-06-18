@@ -51,7 +51,7 @@ Một bộ ảnh nhỏ phục vụ demo được giữ trong:
 data/demo/raw_images/
 ```
 
-Các ảnh này được copy từ test sequence của Faster R-CNN, không lấy từ train split.
+Các ảnh này được copy từ test sequence của Faster R-CNN, không lấy từ train split. Khi demo web, bấm `Choose File` và chọn thủ công một ảnh trong thư mục này.
 
 ## Hướng Làm Baseline
 

@@ -20,13 +20,6 @@ window.SeedUi = (() => {
         confusionSelect.innerHTML = options;
     }
 
-    function renderDemoOptions(items) {
-        const select = document.getElementById("demo-select");
-        select.innerHTML = items
-            .map((item) => `<option value="${item.id}">${item.name} - ${item.sequence} (${item.split})</option>`)
-            .join("");
-    }
-
     function renderModelCards(models) {
         document.getElementById("model-cards").innerHTML = models
             .map((model) => `
@@ -196,7 +189,6 @@ window.SeedUi = (() => {
 
     return {
         renderModelOptions,
-        renderDemoOptions,
         renderModelCards,
         renderMetricsTable,
         renderSelectedMetrics,

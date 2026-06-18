@@ -120,11 +120,6 @@ input {
     background: var(--gray-100);
 }
 
-.full-width {
-    margin-top: 10px;
-    width: 100%;
-}
-
 .app-tabs {
     background: var(--white);
     border-bottom: 1px solid var(--gray-200);
