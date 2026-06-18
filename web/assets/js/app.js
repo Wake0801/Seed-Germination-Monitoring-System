@@ -5,6 +5,7 @@
     let selectedFile = null;
     let playbackTimer = null;
     let activeDetections = data.detections;
+    let availableModels = data.models;
 
     function formatMetric(name, value) {
         if (value === undefined || value === null || value === "") {
@@ -19,6 +20,7 @@
 
     function initialize() {
         ui.renderModelOptions(data.models, "faster_rcnn_scratch");
+        ui.renderDemoOptions(data.demoImages);
         ui.renderModelCards(data.models);
         ui.renderMetricsTable(data.models);
         ui.renderSelectedMetrics(data.selectedMetrics);
@@ -30,6 +32,7 @@
         ui.renderBoundingBoxes(activeDetections);
         ui.updateSummary([]);
         bindEvents();
+        updateActiveModelChip();
         tryLoadBackendModels();
         window.addEventListener("resize", ui.syncOverlayToImage);
     }
@@ -57,10 +60,10 @@
                 f1: "--",
                 notes: model.notes || "",
             }));
-            const detectionModels = registryModels.filter((model) => model.taskType === "object_detection" && model.status === "ready");
             const selectedDetectionModel = registry.selected_detection_model || registry.selected_model;
             if (registryModels.length) {
-                ui.renderModelOptions(detectionModels.length ? detectionModels : registryModels, selectedDetectionModel);
+                availableModels = registryModels;
+                ui.renderModelOptions(registryModels, selectedDetectionModel);
                 ui.renderModelCards(registryModels);
                 ui.renderMetricsTable(registryModels);
                 document.getElementById("active-model-chip").textContent =
@@ -74,13 +77,6 @@
     function bindEvents() {
         document.querySelectorAll(".tab-button").forEach((button) => {
             button.addEventListener("click", () => switchTab(button.dataset.tab));
-        });
-
-        document.querySelectorAll("#input-mode button").forEach((button) => {
-            button.addEventListener("click", () => {
-                document.querySelectorAll("#input-mode button").forEach((item) => item.classList.remove("active"));
-                button.classList.add("active");
-            });
         });
 
         const dropzone = document.getElementById("dropzone");
@@ -106,13 +102,10 @@
             }
         });
 
-        document.getElementById("load-sequence").addEventListener("click", () => {
-            handleFile({ name: "test_sequence_zm.mp4", type: "video/mp4", size: 0, demo: true });
-            showPreview();
-        });
-
+        document.getElementById("load-demo-image").addEventListener("click", loadDemoImage);
         document.getElementById("clear-input").addEventListener("click", clearInput);
         document.getElementById("analyze-btn").addEventListener("click", analyzeInput);
+        document.getElementById("model-select").addEventListener("change", updateActiveModelChip);
         document.getElementById("export-report").addEventListener("click", () => alert("Report export endpoint is reserved for backend integration."));
         document.getElementById("download-results").addEventListener("click", () => alert("Annotated output download is reserved for backend integration."));
 
@@ -132,6 +125,36 @@
         });
     }
 
+    function updateActiveModelChip() {
+        const selectedModel = getSelectedModel();
+        document.getElementById("active-model-chip").textContent = selectedModel?.name || "Selected Model";
+    }
+
+    function getSelectedModel() {
+        const modelId = document.getElementById("model-select").value;
+        return availableModels.find((model) => model.id === modelId) || data.models.find((model) => model.id === modelId);
+    }
+
+    async function loadDemoImage() {
+        const demoId = document.getElementById("demo-select").value;
+        const demo = data.demoImages.find((item) => item.id === demoId);
+        if (!demo) return;
+
+        try {
+            const response = await fetch(demo.url);
+            if (!response.ok) {
+                throw new Error(`Unable to load demo image: ${response.status}`);
+            }
+            const blob = await response.blob();
+            const file = new File([blob], demo.fileName, { type: blob.type || "image/jpeg" });
+            file.demoSource = demo;
+            handleFile(file);
+            showPreview([]);
+        } catch (error) {
+            alert("Cannot load demo image. Run the backend and open http://127.0.0.1:8000/.");
+        }
+    }
+
     function switchTab(tab) {
         document.querySelectorAll(".tab-button").forEach((button) => {
             button.classList.toggle("active", button.dataset.tab === tab);
@@ -145,7 +168,9 @@
         const fileType = file.type ? file.type.split("/")[0] : file.demo ? "video" : "unknown";
         document.getElementById("file-name").textContent = file.name || "selected_input";
         document.getElementById("file-type").textContent = fileType;
-        document.getElementById("file-resolution").textContent = fileType === "image" ? "uploaded image" : "sequence/video";
+        document.getElementById("file-resolution").textContent = file.demoSource
+            ? `${file.demoSource.species} / ${file.demoSource.sequence}`
+            : fileType === "image" ? "uploaded image" : "sequence/video";
         document.getElementById("file-frames").textContent = fileType === "image" ? "1" : "90";
         document.getElementById("file-card").classList.remove("hidden");
     }
@@ -172,8 +197,22 @@
         if (selectedFile && selectedFile.type && selectedFile.type.startsWith("image/") && !selectedFile.demo) {
             try {
                 const modelId = document.getElementById("model-select").value;
-                const prediction = await window.SeedApi.predictDetections(selectedFile, modelId, 0.5);
-                detections = normalizeApiDetections(prediction.detections);
+                const selectedModel = getSelectedModel();
+                if (selectedModel?.taskType === "crop_classification") {
+                    const prediction = await window.SeedApi.predictCrop(selectedFile, modelId);
+                    detections = [
+                        {
+                            id: 1,
+                            state: prediction.display_state,
+                            confidence: Math.round(Number(prediction.confidence) * 100),
+                            bbox: { x: 5, y: 5, width: 90, height: 90 },
+                            pixelBbox: { x: 0, y: 0, width: "full", height: "full" },
+                        },
+                    ];
+                } else {
+                    const prediction = await window.SeedApi.predictDetections(selectedFile, modelId, 0.5);
+                    detections = normalizeApiDetections(prediction.detections);
+                }
             } catch (error) {
                 console.info("Prediction API not available; using simulated detections.");
             }
@@ -199,17 +238,19 @@
         }
         document.getElementById("preview-empty").classList.add("hidden");
         document.getElementById("preview-content").classList.remove("hidden");
-        document.getElementById("timeline-controls").classList.remove("hidden");
+        document.getElementById("timeline-controls").classList.add("hidden");
         document.getElementById("current-frame").textContent = "1";
-        document.getElementById("total-frames").textContent = "90";
+        document.getElementById("total-frames").textContent = "1";
         const slider = document.getElementById("frame-slider");
-        slider.max = "90";
+        slider.max = "1";
         slider.value = "1";
         ui.renderBoundingBoxes(activeDetections);
         requestAnimationFrame(ui.syncOverlayToImage);
         ui.updateSummary(activeDetections);
         if (activeDetections.length) {
             ui.updateCurrentPrediction(activeDetections[0]);
+        } else {
+            ui.resetCurrentPrediction();
         }
     }
 

@@ -14,7 +14,7 @@
         <div>
             <p class="app-kicker">Deep Learning System</p>
             <h1>Seed Germination Monitoring</h1>
-            <p class="app-subtitle">Analyze seed germination state from image, video, or time-lapse sequence inputs.</p>
+            <p class="app-subtitle">Analyze seed germination state from raw Petri-dish images with bounding boxes.</p>
         </div>
         <div class="header-actions">
             <span class="status-pill">
@@ -50,10 +50,10 @@
 
                     <div class="dropzone" id="dropzone">
                         <i class="fas fa-cloud-upload-alt"></i>
-                        <p class="dropzone-title">Drop image, video, or sequence file here</p>
-                        <p class="muted">Supported UI modes: image, video, time-lapse sequence</p>
+                        <p class="dropzone-title">Drop raw Petri image here</p>
+                        <p class="muted">Use a demo test image or upload your own raw image</p>
                         <button class="btn btn-primary" id="choose-file">Choose File</button>
-                        <input class="hidden" id="file-input" type="file" accept="image/*,video/*">
+                        <input class="hidden" id="file-input" type="file" accept="image/*">
                     </div>
 
                     <div class="file-card hidden" id="file-card">
@@ -76,12 +76,12 @@
                     </div>
 
                     <div class="control-group">
-                        <label>Input Mode</label>
-                        <div class="segmented-control" id="input-mode">
-                            <button class="active" data-mode="image">Image</button>
-                            <button data-mode="video">Video</button>
-                            <button data-mode="sequence">Sequence</button>
-                        </div>
+                        <label for="demo-select">Demo Image</label>
+                        <select id="demo-select" class="select-input"></select>
+                        <button class="btn btn-secondary full-width" id="load-demo-image">
+                            <i class="fas fa-image"></i>
+                            Load Demo Image
+                        </button>
                     </div>
 
                     <div class="control-group">
@@ -90,10 +90,6 @@
                     </div>
 
                     <div class="control-stack">
-                        <button class="btn btn-secondary" id="load-sequence">
-                            <i class="fas fa-film"></i>
-                            Load Test Sequence
-                        </button>
                         <button class="btn btn-secondary" id="clear-input">
                             <i class="fas fa-trash-alt"></i>
                             Clear
@@ -117,7 +113,7 @@
                     <div class="preview-stage" id="preview-stage">
                         <div class="empty-state" id="preview-empty">
                             <i class="fas fa-seedling"></i>
-                            <p>Upload a file or load a test sequence to start monitoring.</p>
+                            <p>Upload a raw image or load a demo test image to start monitoring.</p>
                         </div>
                         <div class="processing-state hidden" id="preview-processing">
                             <span class="spinner"></span>

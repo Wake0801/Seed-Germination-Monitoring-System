@@ -11,10 +11,20 @@ window.SeedUi = (() => {
         const select = document.getElementById("model-select");
         const confusionSelect = document.getElementById("confusion-model-select");
         const options = models
-            .map((model) => `<option value="${model.id}" ${model.id === selectedId ? "selected" : ""}>${model.name}</option>`)
+            .map((model) => {
+                const task = model.task ? ` - ${model.task}` : "";
+                return `<option value="${model.id}" ${model.id === selectedId ? "selected" : ""}>${model.name}${task}</option>`;
+            })
             .join("");
         select.innerHTML = options;
         confusionSelect.innerHTML = options;
+    }
+
+    function renderDemoOptions(items) {
+        const select = document.getElementById("demo-select");
+        select.innerHTML = items
+            .map((item) => `<option value="${item.id}">${item.name} - ${item.sequence} (${item.split})</option>`)
+            .join("");
     }
 
     function renderModelCards(models) {
@@ -186,6 +196,7 @@ window.SeedUi = (() => {
 
     return {
         renderModelOptions,
+        renderDemoOptions,
         renderModelCards,
         renderMetricsTable,
         renderSelectedMetrics,

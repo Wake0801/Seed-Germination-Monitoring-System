@@ -20,6 +20,7 @@ http://127.0.0.1:8000/
 - `GET /api/models`: đọc `configs/model_registry.json`.
 - `POST /api/predict/crop`: upload một ảnh crop và chạy model `.pth` bằng PyTorch.
 - `POST /api/predict/detect`: upload ảnh raw và chạy Faster R-CNN scratch để trả về bounding box + trạng thái hạt.
+- `/demo/*`: phục vụ ảnh demo trong `data/demo/`.
 
 ## `.pth` Hay ONNX?
 

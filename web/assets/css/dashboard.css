@@ -120,6 +120,11 @@ input {
     background: var(--gray-100);
 }
 
+.full-width {
+    margin-top: 10px;
+    width: 100%;
+}
+
 .app-tabs {
     background: var(--white);
     border-bottom: 1px solid var(--gray-200);
@@ -620,13 +625,15 @@ td {
 .model-card-grid {
     display: grid;
     gap: 14px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
 
 .model-card {
     background: var(--gray-100);
     border: 1px solid var(--gray-200);
     border-radius: 9px;
+    min-width: 0;
+    overflow: hidden;
     padding: 15px;
 }
 
@@ -634,12 +641,15 @@ td {
     font-size: 16px;
     font-weight: 750;
     margin: 0 0 12px;
+    overflow-wrap: anywhere;
 }
 
 .model-card dl div {
-    display: flex;
-    justify-content: space-between;
-    padding: 5px 0;
+    align-items: start;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: minmax(96px, 0.75fr) minmax(0, 1.25fr);
+    padding: 6px 0;
 }
 
 .model-card dt {
@@ -651,7 +661,12 @@ td {
     color: var(--black);
     font-size: 12px;
     font-weight: 700;
+    line-height: 1.35;
     margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    text-align: right;
+    word-break: break-word;
 }
 
 .badge {

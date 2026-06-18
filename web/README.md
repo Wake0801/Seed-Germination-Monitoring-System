@@ -46,6 +46,14 @@ Dashboard có 2 phần chính:
 
 Khi backend chạy, giao diện gọi inference thật trong `src/inference/`. Nếu backend chưa chạy, giao diện vẫn có dữ liệu mô phỏng để kiểm tra UI.
 
+Ảnh demo có sẵn tại:
+
+```text
+data/demo/raw_images/
+```
+
+Các ảnh này thuộc test split và được web phục vụ qua route `/demo`.
+
 ## Chạy Với Backend PyTorch
 
 Nếu muốn dùng checkpoint `.pth` thật, chạy backend:

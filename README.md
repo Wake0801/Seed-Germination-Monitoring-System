@@ -14,6 +14,7 @@
 
 - `configs/`: lưu cấu hình cho baseline CNN và các thử nghiệm cải tiến.
 - `data/`: lưu dataset raw, crop dataset, metadata và dữ liệu đã xử lý.
+- `data/demo/`: chứa một số ảnh raw thuộc test split dùng cho demo web.
 - `docs/`: lưu ghi chú dữ liệu và phân công công việc nhóm.
 - `src/data/`: chứa script xử lý dữ liệu, parse XML, crop ảnh và chia tập.
 - `src/models/`: chứa định nghĩa các mô hình Deep Learning.
@@ -43,6 +44,14 @@ Mỗi loài có 2 thư mục:
 - `true_ann/`: nhãn `.xml` theo chuẩn Pascal VOC
 
 Raw dataset được ignore khỏi Git vì có kích thước lớn. Repository chỉ lưu cấu trúc, tài liệu, config và mã nguồn.
+
+Một bộ ảnh nhỏ phục vụ demo được giữ trong:
+
+```text
+data/demo/raw_images/
+```
+
+Các ảnh này được copy từ test sequence của Faster R-CNN, không lấy từ train split.
 
 ## Hướng Làm Baseline
 
