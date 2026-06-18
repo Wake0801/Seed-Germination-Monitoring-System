@@ -1,7 +1,7 @@
-# Temporary dependency list. Pin exact versions after the first working baseline.
-torch
-torchvision
-numpy
+# Runtime dependencies for the current baseline + Faster R-CNN web system.
+torch==2.2.1
+torchvision==0.17.1
+numpy<2
 pandas
 pillow
 torchmetrics
@@ -9,3 +9,6 @@ matplotlib
 seaborn
 tqdm
 pyyaml
+fastapi
+uvicorn
+python-multipart

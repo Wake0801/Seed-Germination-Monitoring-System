@@ -1,0 +1,70 @@
+{
+  "selected_model": "faster_rcnn_scratch",
+  "selected_crop_model": "custom_cnn_baseline",
+  "selected_detection_model": "faster_rcnn_scratch",
+  "decision_layer": {
+    "enabled": true,
+    "positive_class": "germinated",
+    "germinated_threshold": 0.7,
+    "non_germinated_threshold": 0.3,
+    "states": [
+      "non_germinated",
+      "transition",
+      "germinated"
+    ]
+  },
+  "models": [
+    {
+      "id": "custom_cnn_baseline",
+      "display_name": "Custom CNN Baseline",
+      "task_type": "crop_classification",
+      "architecture": "custom_cnn",
+      "format": "pth",
+      "status": "ready",
+      "checkpoint_path": "outputs/checkpoints/baseline_cnn/best_custom_cnn.pth",
+      "input_size": 224,
+      "num_classes": 2,
+      "class_names": [
+        "germinated",
+        "non_germinated"
+      ],
+      "metrics_path": "outputs/reports/baseline_cnn/test_summary.json",
+      "primary_metric": "accuracy",
+      "primary_metric_value": 0.8336,
+      "secondary_metric": "macro_f1",
+      "secondary_metric_value": 0.8316,
+      "epochs": 15,
+      "notes": "Baseline crop classification model trained from cropped seed images."
+    },
+    {
+      "id": "faster_rcnn_scratch",
+      "display_name": "Faster R-CNN Scratch",
+      "task_type": "object_detection",
+      "architecture": "fasterrcnn_resnet50_fpn_scratch",
+      "format": "pth",
+      "status": "ready",
+      "checkpoint_path": "outputs/checkpoints/faster_rcnn_scratch/best_faster_rcnn_resnet50_fpn_scratch.pth",
+      "input_size": 640,
+      "min_size": 640,
+      "max_size": 640,
+      "num_classes": 3,
+      "class_names": {
+        "0": "background",
+        "1": "non_germinated",
+        "2": "germinated"
+      },
+      "metrics_path": "outputs/reports/faster_rcnn_scratch/test_summary.json",
+      "score_threshold": 0.5,
+      "primary_metric": "mAP@50",
+      "primary_metric_value": 0.8973336815834045,
+      "secondary_metric": "mAP",
+      "secondary_metric_value": 0.6936748623847961,
+      "epochs": 30,
+      "best_epoch": 6,
+      "pretrained": false,
+      "weights": null,
+      "weights_backbone": null,
+      "notes": "Main teacher-compliant model: raw image object detection trained from scratch."
+    }
+  ]
+}

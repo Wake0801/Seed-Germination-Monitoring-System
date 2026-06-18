@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seed Germination Monitoring</title>
+    <meta name="description" content="Deep learning system for seed germination state analysis">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+</head>
+<body class="min-h-screen bg-gray-100 text-gray-950">
+    <header class="app-header">
+        <div>
+            <p class="app-kicker">Deep Learning System</p>
+            <h1>Seed Germination Monitoring</h1>
+            <p class="app-subtitle">Analyze seed germination state from image, video, or time-lapse sequence inputs.</p>
+        </div>
+        <div class="header-actions">
+            <span class="status-pill">
+                <span class="status-dot"></span>
+                Model Ready
+            </span>
+            <button class="btn btn-secondary" id="export-report">
+                <i class="fas fa-file-export"></i>
+                Export Report
+            </button>
+            <button class="btn btn-primary" id="download-results">
+                <i class="fas fa-download"></i>
+                Download Results
+            </button>
+        </div>
+    </header>
+
+    <nav class="app-tabs" aria-label="Dashboard sections">
+        <button class="tab-button active" data-tab="monitoring">Monitoring System</button>
+        <button class="tab-button" data-tab="comparison">Model Comparison</button>
+    </nav>
+
+    <main class="app-shell">
+        <section class="tab-panel active" id="panel-monitoring">
+            <div class="monitoring-grid">
+                <aside class="panel input-panel">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Input</p>
+                            <h2>Source File</h2>
+                        </div>
+                    </div>
+
+                    <div class="dropzone" id="dropzone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p class="dropzone-title">Drop image, video, or sequence file here</p>
+                        <p class="muted">Supported UI modes: image, video, time-lapse sequence</p>
+                        <button class="btn btn-primary" id="choose-file">Choose File</button>
+                        <input class="hidden" id="file-input" type="file" accept="image/*,video/*">
+                    </div>
+
+                    <div class="file-card hidden" id="file-card">
+                        <div class="file-row">
+                            <span>Name</span>
+                            <strong id="file-name">-</strong>
+                        </div>
+                        <div class="file-row">
+                            <span>Type</span>
+                            <strong id="file-type">-</strong>
+                        </div>
+                        <div class="file-row">
+                            <span>Resolution</span>
+                            <strong id="file-resolution">-</strong>
+                        </div>
+                        <div class="file-row">
+                            <span>Frames</span>
+                            <strong id="file-frames">-</strong>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Input Mode</label>
+                        <div class="segmented-control" id="input-mode">
+                            <button class="active" data-mode="image">Image</button>
+                            <button data-mode="video">Video</button>
+                            <button data-mode="sequence">Sequence</button>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="model-select">Model</label>
+                        <select id="model-select" class="select-input"></select>
+                    </div>
+
+                    <div class="control-stack">
+                        <button class="btn btn-secondary" id="load-sequence">
+                            <i class="fas fa-film"></i>
+                            Load Test Sequence
+                        </button>
+                        <button class="btn btn-secondary" id="clear-input">
+                            <i class="fas fa-trash-alt"></i>
+                            Clear
+                        </button>
+                        <button class="btn btn-primary" id="analyze-btn">
+                            <i class="fas fa-play"></i>
+                            Analyze
+                        </button>
+                    </div>
+                </aside>
+
+                <section class="panel preview-panel">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Visualization</p>
+                            <h2>Detection Preview</h2>
+                        </div>
+                        <span class="model-chip" id="active-model-chip">Best Model</span>
+                    </div>
+
+                    <div class="preview-stage" id="preview-stage">
+                        <div class="empty-state" id="preview-empty">
+                            <i class="fas fa-seedling"></i>
+                            <p>Upload a file or load a test sequence to start monitoring.</p>
+                        </div>
+                        <div class="processing-state hidden" id="preview-processing">
+                            <span class="spinner"></span>
+                            <p>Analyzing frames...</p>
+                        </div>
+                        <div class="preview-content hidden" id="preview-content">
+                            <img id="preview-image" src="" alt="Seed germination frame">
+                            <div id="bounding-boxes"></div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-controls hidden" id="timeline-controls">
+                        <button class="circle-button" id="play-pause" aria-label="Play or pause sequence">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <div class="frame-range">
+                            <div class="frame-meta">
+                                <span>Frame <strong id="current-frame">1</strong>/<strong id="total-frames">1</strong></span>
+                                <select id="speed-select" class="select-mini">
+                                    <option value="0.5">0.5x</option>
+                                    <option value="1" selected>1x</option>
+                                    <option value="2">2x</option>
+                                    <option value="4">4x</option>
+                                </select>
+                            </div>
+                            <input id="frame-slider" type="range" min="1" max="1" value="1">
+                        </div>
+                    </div>
+                </section>
+
+                <aside class="panel summary-panel">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Summary</p>
+                            <h2>Monitoring Info</h2>
+                        </div>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="metric-card">
+                            <span>Total Seeds</span>
+                            <strong id="total-seeds">--</strong>
+                        </div>
+                        <div class="metric-card">
+                            <span>Germinated</span>
+                            <strong class="state-germinated" id="germinated-count">--</strong>
+                        </div>
+                        <div class="metric-card">
+                            <span>Non-germinated</span>
+                            <strong class="state-non-germinated" id="non-germinated-count">--</strong>
+                        </div>
+                        <div class="metric-card">
+                            <span>Transition</span>
+                            <strong class="state-transition" id="transition-count">--</strong>
+                        </div>
+                    </div>
+
+                    <div class="progress-block">
+                        <div class="progress-label">
+                            <span>Germination Percentage</span>
+                            <strong id="germination-percentage">--</strong>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" id="germination-progress"></div>
+                        </div>
+                    </div>
+
+                    <div class="legend-list">
+                        <span><i class="legend-dot germinated"></i>Germinated</span>
+                        <span><i class="legend-dot non-germinated"></i>Non-germinated</span>
+                        <span><i class="legend-dot transition"></i>Transition</span>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>Current Prediction</h3>
+                        <dl>
+                            <div><dt>Seed ID</dt><dd id="current-seed-id">--</dd></div>
+                            <div><dt>State</dt><dd id="current-seed-state">--</dd></div>
+                            <div><dt>Confidence</dt><dd id="current-seed-confidence">--</dd></div>
+                            <div><dt>Bounding Box</dt><dd id="current-seed-bbox">--</dd></div>
+                        </dl>
+                    </div>
+                </aside>
+            </div>
+
+            <div class="monitoring-bottom-grid">
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Time Series</p>
+                            <h2>Germination Over Time</h2>
+                        </div>
+                    </div>
+                    <div class="bar-chart" id="germination-chart"></div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Frames</p>
+                            <h2>Frame Summary</h2>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Frame</th>
+                                    <th>Germinated</th>
+                                    <th>Non-germinated</th>
+                                    <th>Transition</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody id="frame-summary-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <section class="tab-panel" id="panel-comparison">
+            <div class="comparison-grid">
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Models</p>
+                            <h2>Model Overview</h2>
+                        </div>
+                    </div>
+                    <div class="model-card-grid" id="model-cards"></div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Metrics</p>
+                            <h2>Comparison Table</h2>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Task</th>
+                                    <th>Main Metric</th>
+                                    <th>Secondary Metric</th>
+                                    <th>Epochs</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="metrics-table-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <div class="comparison-detail-grid">
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Selected Model</p>
+                            <h2>Metric Cards</h2>
+                        </div>
+                    </div>
+                    <div class="selected-metrics" id="selected-metrics"></div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Evaluation</p>
+                            <h2>Confusion Matrix</h2>
+                        </div>
+                        <select id="confusion-model-select" class="select-mini"></select>
+                    </div>
+                    <div class="confusion-matrix" id="confusion-matrix"></div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Training</p>
+                            <h2>Learning Curves</h2>
+                        </div>
+                    </div>
+                    <div class="curve-grid">
+                        <div>
+                            <p class="chart-title">Loss</p>
+                            <div class="mini-chart" id="loss-chart"></div>
+                        </div>
+                        <div>
+                            <p class="chart-title">Macro F1</p>
+                            <div class="mini-chart" id="f1-chart"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/ui.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
