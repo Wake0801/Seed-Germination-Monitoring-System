@@ -14,7 +14,7 @@
         <div>
             <p class="app-kicker">Deep Learning System</p>
             <h1>Seed Germination Monitoring</h1>
-            <p class="app-subtitle">Analyze seed germination state from raw Petri-dish images with bounding boxes.</p>
+            <p class="app-subtitle">Analyze seed germination state from raw Petri-dish images or sampled video frames with bounding boxes.</p>
         </div>
         <div class="header-actions">
             <span class="status-pill">
@@ -50,10 +50,10 @@
 
                     <div class="dropzone" id="dropzone">
                         <i class="fas fa-cloud-upload-alt"></i>
-                        <p class="dropzone-title">Drop raw Petri image here</p>
-                        <p class="muted">Use a demo test image or upload your own raw image</p>
+                        <p class="dropzone-title">Drop raw image or short video here</p>
+                        <p class="muted">Images run once; videos are sampled into frames for Faster R-CNN detection</p>
                         <button class="btn btn-primary" id="choose-file">Choose File</button>
-                        <input class="hidden" id="file-input" type="file" accept="image/*">
+                        <input class="hidden" id="file-input" type="file" accept="image/*,video/*">
                     </div>
 
                     <div class="file-card hidden" id="file-card">
@@ -77,12 +77,20 @@
 
                     <div class="control-group">
                         <label>Demo Data</label>
-                        <p class="muted">Use Choose File and select an image from data/demo/raw_images.</p>
+                        <p class="muted">Use Choose File and select an image from data/demo/raw_images, or upload a short same-domain Petri video.</p>
                     </div>
 
                     <div class="control-group">
-                        <label for="model-select">Model</label>
+                        <label for="model-select">Detection Model</label>
                         <select id="model-select" class="select-input"></select>
+                    </div>
+
+                    <div class="control-group threshold-control">
+                        <div class="threshold-header">
+                            <label for="confidence-threshold">Confidence Threshold</label>
+                            <output id="threshold-value" for="confidence-threshold">0.50</output>
+                        </div>
+                        <input id="confidence-threshold" class="range-input" type="range" min="0.10" max="0.95" step="0.05" value="0.50">
                     </div>
 
                     <div class="control-stack">
@@ -113,7 +121,7 @@
                         </div>
                         <div class="processing-state hidden" id="preview-processing">
                             <span class="spinner"></span>
-                            <p>Analyzing frames...</p>
+                            <p id="processing-message">Analyzing frames...</p>
                         </div>
                         <div class="preview-content hidden" id="preview-content">
                             <img id="preview-image" src="" alt="Seed germination frame">

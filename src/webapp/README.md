@@ -1,50 +1,80 @@
 # Web Backend
 
-Thư mục này chứa backend tối thiểu cho dashboard `web/`.
+Thu muc nay chua backend FastAPI cho dashboard `web/`.
 
-## Chạy Backend
+## Chay Backend
 
 ```text
 uvicorn src.webapp.api:app --reload
 ```
 
-Sau đó mở:
+Sau do mo:
 
 ```text
 http://127.0.0.1:8000/
 ```
 
-## API Chính
-
-- `GET /api/health`: kiểm tra backend.
-- `GET /api/models`: đọc `configs/model_registry.json`.
-- `POST /api/predict/crop`: upload một ảnh crop và chạy model `.pth` bằng PyTorch.
-- `POST /api/predict/detect`: upload ảnh raw và chạy Faster R-CNN scratch để trả về bounding box + trạng thái hạt.
-
-## `.pth` Hay ONNX?
-
-File `.pth` chạy được nếu hệ thống web có Python backend dùng PyTorch. Đây là hướng hiện tại của project.
-
-Không cần train lại model chỉ để xuất ONNX. ONNX chỉ cần khi:
-
-- muốn chạy inference trực tiếp trong browser,
-- muốn dùng ONNX Runtime,
-- hoặc deploy sang môi trường không dùng PyTorch.
-
-Nếu cần ONNX, dùng:
+Neu port `8000` dang bi chiem, dung port khac:
 
 ```text
-python src/inference/export_onnx.py --model-id custom_cnn_baseline
+uvicorn src.webapp.api:app --reload --port 8001
 ```
 
-## Model Chính Hiện Tại
+Sau do mo:
 
-Hệ thống web hiện ưu tiên Faster R-CNN scratch cho ảnh raw:
+```text
+http://127.0.0.1:8001/
+```
+
+## Tat Backend
+
+Neu terminal dang chay `uvicorn`, bam:
+
+```text
+Ctrl + C
+```
+
+Neu khong nho terminal nao dang chay server, tim PID tren port 8000:
+
+```powershell
+Get-NetTCPConnection -LocalPort 8000 -State Listen | Select-Object -ExpandProperty OwningProcess
+```
+
+Sau do tat process:
+
+```powershell
+Stop-Process -Id <PID>
+```
+
+## API Chinh
+
+- `GET /api/health`: kiem tra backend.
+- `GET /api/models`: doc `configs/model_registry.json`.
+- `POST /api/predict/crop`: upload mot anh crop va chay model `.pth` bang PyTorch.
+- `POST /api/predict/detect`: upload anh raw hoac frame video va chay Faster R-CNN scratch de tra ve bounding box + trang thai hat.
+
+## Model Chinh Hien Tai
+
+He thong web uu tien Faster R-CNN scratch cho anh raw va frame video:
 
 ```text
 outputs/checkpoints/faster_rcnn_scratch/best_faster_rcnn_resnet50_fpn_scratch.pth
 ```
 
-Model này không dùng pretrained weights. File `.pth` lớn hơn giới hạn GitHub
-thông thường, nên checkpoint được giữ local hoặc lưu ngoài repo; code và report
-vẫn được commit bình thường.
+Model nay khong dung pretrained weights. File `.pth` lon hon gioi han GitHub thong thuong, nen checkpoint duoc giu local hoac luu ngoai repo; code, config va report van duoc commit binh thuong.
+
+## `.pth` Hay ONNX?
+
+File `.pth` chay duoc neu he thong web co Python backend dung PyTorch. Day la huong hien tai cua project.
+
+Khong can train lai model chi de xuat ONNX. ONNX chi can khi:
+
+- muon chay inference truc tiep trong browser,
+- muon dung ONNX Runtime,
+- hoac deploy sang moi truong khong dung PyTorch.
+
+Neu can ONNX cho baseline crop classifier, dung:
+
+```text
+python src/inference/export_onnx.py --model-id custom_cnn_baseline
+```
